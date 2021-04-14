@@ -128,6 +128,7 @@ export const FormDiv = styled.div`
     resize: none;
     padding: var(--smallest);
     min-height: 100px;
+    font-family: "Source Sans Pro", "PT Mono", sans-serif, monospace;
   }
 
   textarea:focus {

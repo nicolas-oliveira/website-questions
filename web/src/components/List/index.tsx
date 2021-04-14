@@ -4,22 +4,15 @@ import { Description, ElementBody, Hashtags, Title } from "./styles";
 import { IconButtonContainer, IconButton } from "../../styles/reuseStyles";
 
 interface ListContent {
-  id: number;
   title: string;
   link: string;
   description: string;
   tags: Array<string>;
 }
 
-export default function List({
-  id,
-  title,
-  description,
-  link,
-  tags,
-}: ListContent) {
+export default function List({ title, description, link, tags }: ListContent) {
   return (
-    <ElementBody key={id}>
+    <ElementBody>
       <IconButtonContainer title="Excluir">
         <IconButton>
           <FiTrash2 size="16px" />
@@ -31,7 +24,7 @@ export default function List({
 
       <Hashtags>
         {tags.map((tag) => {
-          return <span>#{tag}</span>;
+          return <span key={tag}>#{tag}</span>;
         })}
       </Hashtags>
     </ElementBody>

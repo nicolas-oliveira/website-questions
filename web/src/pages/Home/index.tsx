@@ -28,12 +28,20 @@ import { AiOutlineSearch, AiOutlinePlus } from "react-icons/ai";
 interface state {
   isModalOpen: boolean;
   tools: Array<any>;
+  title: string;
+  link: string;
+  description: string;
+  tags: "";
 }
 
 export default class Home extends Component {
   state = {
     isModalOpen: false,
     tools: [],
+    title: "",
+    link: "",
+    description: "",
+    tags: "",
   };
 
   async componentDidMount() {
@@ -70,8 +78,13 @@ export default class Home extends Component {
     }
   }
 
+  async handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    console.log(e);
+  }
+
   render() {
-    const { isModalOpen, tools } = this.state;
+    const { isModalOpen, tools, title, link, description, tags } = this.state;
 
     return (
       <HomeContainer>
@@ -93,7 +106,7 @@ export default class Home extends Component {
 
           <Button onClick={() => this.toggleModal()}>
             <AiOutlinePlus />
-            <button>Add</button>
+            Add
           </Button>
         </Actions>
 
@@ -110,20 +123,43 @@ export default class Home extends Component {
                 <AiOutlinePlus size="26px" />
                 <h1>Add New Tool</h1>
               </div>
-              <form>
+              <form onSubmit={this.handleSubmit}>
                 <label>Tool Name</label>
-                <Input></Input>
+                <Input
+                  value={title}
+                  onChange={(event) =>
+                    this.setState({ title: event.target.value })
+                  }
+                  required
+                />
 
                 <label>Tool Link</label>
-                <Input></Input>
+                <Input
+                  value={link}
+                  onChange={(event) =>
+                    this.setState({ link: event.target.value })
+                  }
+                />
 
                 <label>Tool Description</label>
-                <textarea></textarea>
+                <textarea
+                  value={description}
+                  onChange={(event) =>
+                    this.setState({ description: event.target.value })
+                  }
+                />
 
                 <label>Tags</label>
-                <Input></Input>
+                <Input
+                  value={tags}
+                  onChange={(event) =>
+                    this.setState({ tags: event.target.value })
+                  }
+                />
 
-                <Button className="button-left">Add tool</Button>
+                <Button className="button-left" type="submit">
+                  Add tool
+                </Button>
               </form>
             </FormDiv>
           </Modal>
@@ -133,7 +169,6 @@ export default class Home extends Component {
           return (
             <List
               key={id}
-              id={id}
               title={title}
               link={link}
               description={description}

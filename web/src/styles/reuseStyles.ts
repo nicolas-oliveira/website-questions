@@ -18,7 +18,8 @@ export const IconButton = styled.div`
   }
 `;
 
-export const Button = styled.div`
+export const Button = styled.button`
+  all: unset;
   display: flex;
   justify-content: center;
   align-items: center;
