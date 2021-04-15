@@ -51,16 +51,6 @@
         "such"
       ],
       "id": 5
-    },
-    {
-      "title": "Jest",
-      "link": "jest.com",
-      "description": "jest is an aplication to development and TDD",
-      "tags": [
-        "jest",
-        "tdd"
-      ],
-      "id": 6
     }
   ]
 }
