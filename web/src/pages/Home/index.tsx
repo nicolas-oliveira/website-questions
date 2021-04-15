@@ -87,29 +87,29 @@ export default class Home extends Component {
       const { formTitle, formLink, formDescription, formTags } = this.state;
 
       this.setState({ loading: true });
-
-      await api.post("tools", {
+      const newTool = {
         title: formTitle,
         link: formLink,
         description: formDescription,
         tags: formTags.split(/[# ]+/).filter((e) => e),
-      });
+      };
 
-      console.log({
-        title: formTitle,
-        link: formLink,
-        description: formDescription,
-        tags: formTags.split(/[# ]+/).filter((e) => e),
-      });
+      await api.post("tools", newTool);
+
+      console.log(newTool);
+
+      const { tools } = this.state;
 
       this.setState({
         isModalOpen: false,
         loading: false,
+        tools: [...tools, newTool],
         formTitle: "",
         formLink: "",
         formDescription: "",
         formTags: "",
       });
+      console.log("Requisição feita com sucesso");
     } catch (error) {
       console.error(error);
     }
@@ -118,12 +118,12 @@ export default class Home extends Component {
   render() {
     const {
       isModalOpen,
+      loading,
       tools,
       formTitle,
       formLink,
       formDescription,
       formTags,
-      loading,
     } = this.state;
 
     return (
