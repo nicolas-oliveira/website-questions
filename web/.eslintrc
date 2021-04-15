@@ -8,6 +8,6 @@
   },
   "rules": {
     "semi": "warn",
-    "@typescript-eslint/no-unused-vars": false
+    "@typescript-eslint/no-unused-vars": off
   }
 }

@@ -1,12 +1,17 @@
-import styled from "styled-components";
+// Aqui contém estilos utilizados mais de uma vez na aplicação
+import styled, { css, keyframes } from "styled-components";
 
-export const IconButtonContainer = styled.a`
+// Estilo usado para os ícones que devem ficar no canto superior direito
+// de uma div qualquer
+export const AbsolutePositioningButtonDiv = styled.a`
   position: absolute;
   right: 0;
   top: 0;
 `;
 
-export const IconButton = styled.div`
+// Estilo filho de AbsolutePositioningButtonDiv com a finalidade de tornar o
+// ícone centralizado e com animação
+export const ButtonDivChild = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -18,7 +23,17 @@ export const IconButton = styled.div`
   }
 `;
 
-export const Button = styled.button`
+const rotate = keyframes`
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+`;
+
+// Botão comum utilizado em várias partes da aplicação
+export const Button = styled.button.attrs((props) => {})`
   all: unset;
   display: flex;
   justify-content: center;
@@ -45,6 +60,18 @@ export const Button = styled.button`
   button {
     all: unset;
   }
+
+  &[disabled] {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+  ${(props) =>
+    props.loading &&
+    css`
+      svg {
+        animation: ${rotate} linear infinite 2s;
+      }
+    `}
 
   @media (max-width: 768px) {
     margin-top: var(--small);

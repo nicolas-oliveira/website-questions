@@ -1,7 +1,10 @@
 import React from "react";
 import { FiTrash2 } from "react-icons/fi";
 import { Description, ElementBody, Hashtags, Title } from "./styles";
-import { IconButtonContainer, IconButton } from "../../styles/reuseStyles";
+import {
+  AbsolutePositioningButtonDiv,
+  ButtonDivChild,
+} from "../../styles/reuseStyles";
 
 interface ListContent {
   title: string;
@@ -13,18 +16,18 @@ interface ListContent {
 export default function List({ title, description, link, tags }: ListContent) {
   return (
     <ElementBody>
-      <IconButtonContainer title="Excluir">
-        <IconButton>
+      <AbsolutePositioningButtonDiv title="Excluir">
+        <ButtonDivChild>
           <FiTrash2 size="16px" />
-        </IconButton>
-      </IconButtonContainer>
+        </ButtonDivChild>
+      </AbsolutePositioningButtonDiv>
 
       <Title href={link}>{title}</Title>
       <Description>{description}</Description>
 
       <Hashtags>
-        {tags.map((tag) => {
-          return <span key={tag}>#{tag}</span>;
+        {tags?.map((tag, index) => {
+          return <span key={index}>#{tag}</span>;
         })}
       </Hashtags>
     </ElementBody>

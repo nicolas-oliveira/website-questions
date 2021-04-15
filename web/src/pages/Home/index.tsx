@@ -14,19 +14,20 @@ import {
 } from "./styles";
 
 import {
-  IconButtonContainer,
-  IconButton,
+  AbsolutePositioningButtonDiv,
+  ButtonDivChild,
   Button,
 } from "../../styles/reuseStyles";
 
 import api from "../../services/api";
 import List from "../../components/List";
 
-import { AiOutlineClose } from "react-icons/ai";
+import { AiOutlineClose, AiOutlineLoading } from "react-icons/ai";
 import { AiOutlineSearch, AiOutlinePlus } from "react-icons/ai";
 
 interface state {
   isModalOpen: boolean;
+  loading: boolean;
   tools: Array<any>;
   title: string;
   link: string;
@@ -37,11 +38,12 @@ interface state {
 export default class Home extends Component {
   state = {
     isModalOpen: false,
+    loading: false,
     tools: [],
-    title: "",
-    link: "",
-    description: "",
-    tags: "",
+    formTitle: "",
+    formLink: "",
+    formDescription: "",
+    formTags: "",
   };
 
   async componentDidMount() {
@@ -78,13 +80,51 @@ export default class Home extends Component {
     }
   }
 
-  async handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    console.log(e);
-  }
+  handleSubmit = async (e: FormEvent) => {
+    try {
+      e.preventDefault();
+
+      const { formTitle, formLink, formDescription, formTags } = this.state;
+
+      this.setState({ loading: true });
+
+      await api.post("tools", {
+        title: formTitle,
+        link: formLink,
+        description: formDescription,
+        tags: formTags.split(/[# ]+/).filter((e) => e),
+      });
+
+      console.log({
+        title: formTitle,
+        link: formLink,
+        description: formDescription,
+        tags: formTags.split(/[# ]+/).filter((e) => e),
+      });
+
+      this.setState({
+        isModalOpen: false,
+        loading: false,
+        formTitle: "",
+        formLink: "",
+        formDescription: "",
+        formTags: "",
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   render() {
-    const { isModalOpen, tools, title, link, description, tags } = this.state;
+    const {
+      isModalOpen,
+      tools,
+      formTitle,
+      formLink,
+      formDescription,
+      formTags,
+      loading,
+    } = this.state;
 
     return (
       <HomeContainer>
@@ -113,11 +153,11 @@ export default class Home extends Component {
         {isModalOpen ? (
           <Modal>
             <FormDiv>
-              <IconButtonContainer>
-                <IconButton onClick={() => this.toggleModal()}>
+              <AbsolutePositioningButtonDiv>
+                <ButtonDivChild onClick={() => this.toggleModal()}>
                   <AiOutlineClose size="20px" />
-                </IconButton>
-              </IconButtonContainer>
+                </ButtonDivChild>
+              </AbsolutePositioningButtonDiv>
 
               <div className="title-column">
                 <AiOutlinePlus size="26px" />
@@ -126,39 +166,42 @@ export default class Home extends Component {
               <form onSubmit={this.handleSubmit}>
                 <label>Tool Name</label>
                 <Input
-                  value={title}
+                  value={formTitle}
                   onChange={(event) =>
-                    this.setState({ title: event.target.value })
+                    this.setState({ formTitle: event.target.value })
                   }
                   required
                 />
 
                 <label>Tool Link</label>
                 <Input
-                  value={link}
+                  value={formLink}
                   onChange={(event) =>
-                    this.setState({ link: event.target.value })
+                    this.setState({ formLink: event.target.value })
                   }
                 />
 
                 <label>Tool Description</label>
                 <textarea
-                  value={description}
+                  value={formDescription}
                   onChange={(event) =>
-                    this.setState({ description: event.target.value })
+                    this.setState({ formDescription: event.target.value })
                   }
                 />
 
                 <label>Tags</label>
                 <Input
-                  value={tags}
+                  value={formTags}
                   onChange={(event) =>
-                    this.setState({ tags: event.target.value })
+                    this.setState({ formTags: event.target.value })
                   }
                 />
-
-                <Button className="button-left" type="submit">
-                  Add tool
+                <Button
+                  className="button-left"
+                  type="submit"
+                  loading={loading.toString()}
+                >
+                  {loading ? <AiOutlineLoading /> : "Add tool"}
                 </Button>
               </form>
             </FormDiv>
