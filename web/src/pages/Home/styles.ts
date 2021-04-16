@@ -146,10 +146,6 @@ export const FormDiv = styled.div`
     margin-bottom: var(--medium);
   }
 
-  .button-left {
-    padding: 10px;
-    margin-left: 70%;
-  }
   form {
     display: flex;
     flex-direction: column;

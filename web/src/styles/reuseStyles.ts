@@ -23,17 +23,8 @@ export const ButtonDivChild = styled.div`
   }
 `;
 
-const rotate = keyframes`
-	from {
-		transform: rotate(0deg);
-	}
-	to {
-		transform: rotate(360deg);
-	}
-`;
-
 // Botão comum utilizado em várias partes da aplicação
-export const Button = styled.button.attrs((props) => {})`
+export const Button = styled.button`
   all: unset;
   display: flex;
   justify-content: center;
@@ -57,14 +48,38 @@ export const Button = styled.button.attrs((props) => {})`
     background-color: var(--darker-blue);
   }
 
-  button {
-    all: unset;
+  @media (max-width: 768px) {
+    margin-top: var(--small);
+    padding: var(--small);
   }
+`;
+
+const rotate = keyframes`
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+`;
+
+interface ButtonProps {
+  loading: boolean;
+}
+
+export const ButtonSubmit = styled(Button).attrs<ButtonProps>(
+  ({ loading }) => ({
+    disabled: loading,
+  })
+)<ButtonProps>`
+  padding: 10px;
+  margin-left: 70%;
 
   &[disabled] {
     cursor: not-allowed;
     opacity: 0.6;
   }
+
   ${(props) =>
     props.loading &&
     css`
@@ -72,9 +87,4 @@ export const Button = styled.button.attrs((props) => {})`
         animation: ${rotate} linear infinite 2s;
       }
     `}
-
-  @media (max-width: 768px) {
-    margin-top: var(--small);
-    padding: var(--small);
-  }
 `;

@@ -17,6 +17,7 @@ import {
   AbsolutePositioningButtonDiv,
   ButtonDivChild,
   Button,
+  ButtonSubmit,
 } from "../../styles/reuseStyles";
 
 import api from "../../services/api";
@@ -32,7 +33,7 @@ interface state {
   title: string;
   link: string;
   description: string;
-  tags: "";
+  tags: string;
 }
 
 export default class Home extends Component {
@@ -51,7 +52,7 @@ export default class Home extends Component {
     if (tools) this.setState({ tools: JSON.parse(tools) });
 
     await api
-      .get("tools")
+      .get("tools?_sort=id&_order=desc")
       .then((response) => this.setState({ tools: response.data }));
   }
 
@@ -91,7 +92,7 @@ export default class Home extends Component {
         title: formTitle,
         link: formLink,
         description: formDescription,
-        tags: formTags.split(/[# ]+/).filter((e) => e),
+        tags: formTags.split(/[# ]+/).filter((eachTag) => eachTag),
       };
 
       await api.post("tools", newTool);
@@ -103,7 +104,7 @@ export default class Home extends Component {
       this.setState({
         isModalOpen: false,
         loading: false,
-        tools: [...tools, newTool],
+        tools: [newTool, ...tools],
         formTitle: "",
         formLink: "",
         formDescription: "",
@@ -179,6 +180,8 @@ export default class Home extends Component {
                   onChange={(event) =>
                     this.setState({ formLink: event.target.value })
                   }
+                  type="url"
+                  required
                 />
 
                 <label>Tool Description</label>
@@ -187,6 +190,7 @@ export default class Home extends Component {
                   onChange={(event) =>
                     this.setState({ formDescription: event.target.value })
                   }
+                  required
                 />
 
                 <label>Tags</label>
@@ -196,13 +200,9 @@ export default class Home extends Component {
                     this.setState({ formTags: event.target.value })
                   }
                 />
-                <Button
-                  className="button-left"
-                  type="submit"
-                  loading={loading.toString()}
-                >
+                <ButtonSubmit type="submit" loading={loading}>
                   {loading ? <AiOutlineLoading /> : "Add tool"}
-                </Button>
+                </ButtonSubmit>
               </form>
             </FormDiv>
           </Modal>

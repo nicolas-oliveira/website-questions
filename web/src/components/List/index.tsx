@@ -16,7 +16,7 @@ interface ListContent {
 export default function List({ title, description, link, tags }: ListContent) {
   return (
     <ElementBody>
-      <AbsolutePositioningButtonDiv title="Excluir">
+      <AbsolutePositioningButtonDiv title="Delete">
         <ButtonDivChild>
           <FiTrash2 size="16px" />
         </ButtonDivChild>
