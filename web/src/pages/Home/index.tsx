@@ -16,8 +16,8 @@ import {
 import {
   AbsolutePositioningButtonDiv,
   ButtonDivChild,
-  Button,
   ButtonSubmit,
+  Button,
 } from "../../styles/reuseStyles";
 
 import api from "../../services/api";
@@ -200,13 +200,15 @@ export default class Home extends Component {
                     this.setState({ formTags: event.target.value })
                   }
                 />
-                <ButtonSubmit type="submit" loading={loading}>
+                <ButtonSubmit className="button-left" $loading={loading}>
                   {loading ? <AiOutlineLoading /> : "Add tool"}
                 </ButtonSubmit>
               </form>
             </FormDiv>
           </Modal>
-        ) : null}
+        ) : (
+          ""
+        )}
 
         {tools.map(({ id, title, link, description, tags }) => {
           return (

@@ -64,12 +64,12 @@ const rotate = keyframes`
 `;
 
 interface ButtonProps {
-  loading: boolean;
+  $loading: boolean;
 }
 
 export const ButtonSubmit = styled(Button).attrs<ButtonProps>(
-  ({ loading }) => ({
-    disabled: loading,
+  ({ $loading }) => ({
+    disabled: $loading,
   })
 )<ButtonProps>`
   padding: 10px;
@@ -80,8 +80,8 @@ export const ButtonSubmit = styled(Button).attrs<ButtonProps>(
     opacity: 0.6;
   }
 
-  ${(props) =>
-    props.loading &&
+  ${({ $loading }) =>
+    $loading &&
     css`
       svg {
         animation: ${rotate} linear infinite 2s;
