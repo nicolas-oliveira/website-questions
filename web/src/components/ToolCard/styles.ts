@@ -12,7 +12,7 @@ export const ElementBody = styled.div`
   max-width: 85vw;
 `;
 
-export const Title = styled.a`
+export const TitleCard = styled.a`
   font-size: var(--medium);
   color: var(--blue);
   text-decoration: underline;

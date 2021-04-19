@@ -30,6 +30,14 @@ import {
   TitleCard,
 } from "../../components/ToolCard/styles";
 
+import api from "../../services/api";
+// import ToolCard from "../../components/ToolCard";
+
+import { FiTrash2 } from "react-icons/fi";
+import { AiOutlineClose, AiOutlineLoading } from "react-icons/ai";
+import { AiOutlineSearch, AiOutlinePlus } from "react-icons/ai";
+import ToolCard from "../../components/ToolCard";
+
 interface ToolCardContent {
   id: number;
   title: string;
@@ -37,13 +45,6 @@ interface ToolCardContent {
   description: string;
   tags: String[];
 }
-
-import api from "../../services/api";
-// import ToolCard from "../../components/ToolCard";
-
-import { FiTrash2 } from "react-icons/fi";
-import { AiOutlineClose, AiOutlineLoading } from "react-icons/ai";
-import { AiOutlineSearch, AiOutlinePlus } from "react-icons/ai";
 
 interface state {
   isModalFormOpen: boolean;
@@ -147,6 +148,7 @@ export default class Home extends Component {
         formDescription: "",
         formTags: "",
       });
+
       console.log("Requisição feita com sucesso");
     } catch (error) {
       console.error(error);
@@ -162,8 +164,6 @@ export default class Home extends Component {
       this.setState({
         tools: tools.filter((e: ToolCardContent) => e.id !== id),
       });
-
-      console.log(id);
     } catch (error) {
       console.error(error);
     }
@@ -209,7 +209,11 @@ export default class Home extends Component {
           <Modal>
             <FormDiv>
               <AbsolutePositioningButtonDiv>
-                <ButtonDivChild onClick={() => this.toggleModalForm()}>
+                <ButtonDivChild
+                  onClick={() =>
+                    this.setState({ isModalFormOpen: !isModalFormOpen })
+                  }
+                >
                   <AiOutlineClose size="20px" />
                 </ButtonDivChild>
               </AbsolutePositioningButtonDiv>
@@ -288,22 +292,15 @@ export default class Home extends Component {
 
         {tools.map((tool: ToolCardContent) => {
           return (
-            <ElementBody key={tool.id}>
-              <AbsolutePositioningButtonDiv title="Delete">
-                <ButtonDivChild onClick={() => this.toggleModalDelete()}>
-                  <FiTrash2 size="16px" />
-                </ButtonDivChild>
-              </AbsolutePositioningButtonDiv>
-
-              <TitleCard href={tool.link}>{tool.title}</TitleCard>
-              <Description>{tool.description}</Description>
-
-              <Hashtags>
-                {tool.tags?.map((tag) => {
-                  return <span>#{tag}</span>;
-                })}
-              </Hashtags>
-            </ElementBody>
+            <ToolCard
+              key={tool.id}
+              id={tool.id}
+              title={tool.title}
+              link={tool.link}
+              description={tool.description}
+              tags={tool.tags}
+              toggle={this.toggleModalDelete.bind(this)}
+            />
           );
         })}
       </HomeContainer>
