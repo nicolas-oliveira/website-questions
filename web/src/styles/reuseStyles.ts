@@ -24,11 +24,12 @@ export const ButtonDivChild = styled.div`
 `;
 
 // Botão comum utilizado em várias partes da aplicação
-export const Button = styled.button`
+export const ButtonPrimary = styled.button`
   all: unset;
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: var(--most-smallest);
 
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -40,7 +41,7 @@ export const Button = styled.button`
   transition: 0.1s;
 
   border-radius: 5px;
-  padding: 0 var(--small);
+  padding: var(--most-smallest) var(--medium);
   background-color: var(--blue);
   color: var(--white);
 
@@ -50,7 +51,7 @@ export const Button = styled.button`
 
   @media (max-width: 768px) {
     margin-top: var(--small);
-    padding: var(--small);
+    padding: 0 var(--small);
   }
 `;
 
@@ -67,13 +68,12 @@ interface ButtonProps {
   $loading: boolean;
 }
 
-export const ButtonSubmit = styled(Button).attrs<ButtonProps>(
+export const ButtonSubmit = styled(ButtonPrimary).attrs<ButtonProps>(
   ({ $loading }) => ({
     disabled: $loading,
   })
 )<ButtonProps>`
-  padding: 10px;
-  margin-left: 70%;
+  padding: var(--smallest) var(--medium);
 
   &[disabled] {
     cursor: not-allowed;
@@ -87,4 +87,12 @@ export const ButtonSubmit = styled(Button).attrs<ButtonProps>(
         animation: ${rotate} linear infinite 2s;
       }
     `}
+`;
+
+export const ButtonAlert = styled(ButtonPrimary)`
+  background-color: var(--red);
+
+  &:hover {
+    background-color: var(--darker-red);
+  }
 `;

@@ -78,6 +78,21 @@ export const Input = styled.input`
   }
 `;
 
+export const Textarea = styled.textarea`
+  background: var(--darkerst-white) 0% 0% no-repeat padding-box;
+  border: 1px solid var(--most-darkerst-white);
+  border-radius: 5px;
+  opacity: 1;
+  resize: none;
+  padding: var(--smallest);
+  min-height: 100px;
+  font-family: "Source Sans Pro", "PT Mono", sans-serif, monospace;
+
+  &:focus {
+    border: 1px solid var(--ink);
+  }
+`;
+
 export const Title = styled.h1`
   font-size: var(--big);
   margin-top: var(--small);
@@ -109,6 +124,7 @@ export const Modal = styled.div`
 
 export const FormDiv = styled.div`
   position: relative;
+
   display: flex;
   flex-direction: column;
   justify-content: column;
@@ -120,36 +136,28 @@ export const FormDiv = styled.div`
   width: 90%;
   padding: var(--bigger);
 
-  textarea {
-    background: var(--darkerst-white) 0% 0% no-repeat padding-box;
-    border: 1px solid var(--most-darkerst-white);
-    border-radius: 5px;
-    opacity: 1;
-    resize: none;
-    padding: var(--smallest);
-    min-height: 100px;
-    font-family: "Source Sans Pro", "PT Mono", sans-serif, monospace;
-  }
-
-  textarea:focus {
-    border: 1px solid var(--ink);
+  .title-column {
+    display: flex;
+    justify-content: column;
+    align-items: center;
+    margin-bottom: var(--small);
   }
 
   input {
     margin-bottom: 10px;
   }
 
-  .title-column {
-    display: flex;
-    align-items: center;
-    justify-content: column;
-    margin-bottom: var(--medium);
-  }
-
   form {
     display: flex;
     flex-direction: column;
   }
+`;
+
+export const ButtonContainerLeft = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--small);
 `;
 
 export const CloseContainer = styled.div`

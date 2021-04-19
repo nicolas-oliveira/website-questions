@@ -11,34 +11,55 @@ import {
   Modal,
   Input,
   FormDiv,
+  ButtonContainerLeft,
+  Textarea,
 } from "./styles";
 
 import {
   AbsolutePositioningButtonDiv,
   ButtonDivChild,
   ButtonSubmit,
-  Button,
+  ButtonPrimary,
+  ButtonAlert,
 } from "../../styles/reuseStyles";
 
-import api from "../../services/api";
-import List from "../../components/List";
+import {
+  Description,
+  ElementBody,
+  Hashtags,
+  TitleCard,
+} from "../../components/ToolCard/styles";
 
+interface ToolCardContent {
+  id: number;
+  title: string;
+  link: string;
+  description: string;
+  tags: String[];
+}
+
+import api from "../../services/api";
+// import ToolCard from "../../components/ToolCard";
+
+import { FiTrash2 } from "react-icons/fi";
 import { AiOutlineClose, AiOutlineLoading } from "react-icons/ai";
 import { AiOutlineSearch, AiOutlinePlus } from "react-icons/ai";
 
 interface state {
-  isModalOpen: boolean;
+  isModalFormOpen: boolean;
+  isModalDeleteOpen: boolean;
   loading: boolean;
-  tools: Array<any>;
-  title: string;
-  link: string;
-  description: string;
-  tags: string;
+  tools: ToolCardContent[];
+  formTitle: string;
+  formLink: string;
+  formDescription: string;
+  formTags: string;
 }
 
 export default class Home extends Component {
   state = {
-    isModalOpen: false,
+    isModalFormOpen: false,
+    isModalDeleteOpen: false,
     loading: false,
     tools: [],
     formTitle: "",
@@ -57,27 +78,43 @@ export default class Home extends Component {
   }
 
   componentDidUpdate(e: any, prevState: state) {
-    const { isModalOpen, tools } = this.state;
+    const { isModalFormOpen, tools } = this.state;
     const body = document.querySelector("body");
 
     if (prevState.tools !== tools) {
       localStorage.setItem("tools", JSON.stringify(tools));
     }
 
-    if (isModalOpen) {
+    if (isModalFormOpen) {
       if (body) body.style.overflowY = "hidden";
     } else {
       if (body) body.style.overflowY = "auto";
     }
   }
 
-  toggleModal() {
-    const { isModalOpen } = this.state;
+  async getItems() {
+    await api
+      .get("tools?_sort=id&_order=desc")
+      .then((response) => this.setState({ tools: response.data }));
+  }
 
-    if (!isModalOpen) {
-      this.setState({ isModalOpen: true });
+  toggleModalForm() {
+    const { isModalFormOpen } = this.state;
+
+    if (!isModalFormOpen) {
+      this.setState({ isModalFormOpen: true });
     } else {
-      this.setState({ isModalOpen: false });
+      this.setState({ isModalFormOpen: false });
+    }
+  }
+
+  toggleModalDelete() {
+    const { isModalDeleteOpen } = this.state;
+
+    if (!isModalDeleteOpen) {
+      this.setState({ isModalDeleteOpen: true });
+    } else {
+      this.setState({ isModalDeleteOpen: false });
     }
   }
 
@@ -88,6 +125,7 @@ export default class Home extends Component {
       const { formTitle, formLink, formDescription, formTags } = this.state;
 
       this.setState({ loading: true });
+
       const newTool = {
         title: formTitle,
         link: formLink,
@@ -99,12 +137,11 @@ export default class Home extends Component {
 
       console.log(newTool);
 
-      const { tools } = this.state;
+      this.getItems();
 
       this.setState({
-        isModalOpen: false,
+        isModalFormOpen: false,
         loading: false,
-        tools: [newTool, ...tools],
         formTitle: "",
         formLink: "",
         formDescription: "",
@@ -116,9 +153,26 @@ export default class Home extends Component {
     }
   };
 
+  deleteItem = async (id: number) => {
+    try {
+      const { tools } = this.state;
+
+      await api.delete(`/tools/${id}`);
+
+      this.setState({
+        tools: tools.filter((e: ToolCardContent) => e.id !== id),
+      });
+
+      console.log(id);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   render() {
     const {
-      isModalOpen,
+      isModalFormOpen,
+      isModalDeleteOpen,
       loading,
       tools,
       formTitle,
@@ -145,17 +199,17 @@ export default class Home extends Component {
             </Checkbox>
           </GroupSearch>
 
-          <Button onClick={() => this.toggleModal()}>
+          <ButtonPrimary onClick={() => this.toggleModalForm()}>
             <AiOutlinePlus />
             Add
-          </Button>
+          </ButtonPrimary>
         </Actions>
 
-        {isModalOpen ? (
+        {isModalFormOpen ? (
           <Modal>
             <FormDiv>
               <AbsolutePositioningButtonDiv>
-                <ButtonDivChild onClick={() => this.toggleModal()}>
+                <ButtonDivChild onClick={() => this.toggleModalForm()}>
                   <AiOutlineClose size="20px" />
                 </ButtonDivChild>
               </AbsolutePositioningButtonDiv>
@@ -185,7 +239,7 @@ export default class Home extends Component {
                 />
 
                 <label>Tool Description</label>
-                <textarea
+                <Textarea
                   value={formDescription}
                   onChange={(event) =>
                     this.setState({ formDescription: event.target.value })
@@ -200,9 +254,11 @@ export default class Home extends Component {
                     this.setState({ formTags: event.target.value })
                   }
                 />
-                <ButtonSubmit className="button-left" $loading={loading}>
-                  {loading ? <AiOutlineLoading /> : "Add tool"}
-                </ButtonSubmit>
+                <ButtonContainerLeft>
+                  <ButtonSubmit $loading={loading}>
+                    {loading ? <AiOutlineLoading /> : "Add tool"}
+                  </ButtonSubmit>
+                </ButtonContainerLeft>
               </form>
             </FormDiv>
           </Modal>
@@ -210,15 +266,44 @@ export default class Home extends Component {
           ""
         )}
 
-        {tools.map(({ id, title, link, description, tags }) => {
+        {isModalDeleteOpen ? (
+          <Modal>
+            <FormDiv>
+              <h1>Remove tool</h1>
+              <p>Are you sure you want remove tool.title?</p>
+
+              <ButtonContainerLeft>
+                <ButtonPrimary onClick={() => this.toggleModalDelete()}>
+                  Cancel
+                </ButtonPrimary>
+                <ButtonAlert onClick={() => console.log("infelizmente")}>
+                  Yes, remove
+                </ButtonAlert>
+              </ButtonContainerLeft>
+            </FormDiv>
+          </Modal>
+        ) : (
+          ""
+        )}
+
+        {tools.map((tool: ToolCardContent) => {
           return (
-            <List
-              key={id}
-              title={title}
-              link={link}
-              description={description}
-              tags={tags}
-            />
+            <ElementBody key={tool.id}>
+              <AbsolutePositioningButtonDiv title="Delete">
+                <ButtonDivChild onClick={() => this.toggleModalDelete()}>
+                  <FiTrash2 size="16px" />
+                </ButtonDivChild>
+              </AbsolutePositioningButtonDiv>
+
+              <TitleCard href={tool.link}>{tool.title}</TitleCard>
+              <Description>{tool.description}</Description>
+
+              <Hashtags>
+                {tool.tags?.map((tag) => {
+                  return <span>#{tag}</span>;
+                })}
+              </Hashtags>
+            </ElementBody>
           );
         })}
       </HomeContainer>
