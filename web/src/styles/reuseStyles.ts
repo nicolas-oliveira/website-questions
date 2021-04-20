@@ -48,11 +48,6 @@ export const ButtonPrimary = styled.button`
   &:hover {
     background-color: var(--darker-blue);
   }
-
-  @media (max-width: 768px) {
-    margin-top: var(--small);
-    padding: 0 var(--small);
-  }
 `;
 
 const rotate = keyframes`
@@ -73,7 +68,8 @@ export const ButtonSubmit = styled(ButtonPrimary).attrs<ButtonProps>(
     disabled: $loading,
   })
 )<ButtonProps>`
-  padding: var(--smallest) var(--medium);
+  height: 2em;
+  min-width: 4em;
 
   &[disabled] {
     cursor: not-allowed;
@@ -89,7 +85,7 @@ export const ButtonSubmit = styled(ButtonPrimary).attrs<ButtonProps>(
     `}
 `;
 
-export const ButtonAlert = styled(ButtonPrimary)`
+export const ButtonAlert = styled(ButtonSubmit)`
   background-color: var(--red);
 
   &:hover {

@@ -89,8 +89,8 @@ export default createGlobalStyle`
     font-family: 'Source Sans Pro', 'PT Mono', sans-serif, monospace;
     color: var(--ink);
 
-    @media (max-width: 2560px) {font-size: 20px;}
-    @media (max-width: 1440px) {font-size: 18px;}
+    @media (min-width: 2560px) {font-size: 18px;}
+    @media (max-width: 2560px) {font-size: 18px;}
     @media (max-width: 1024px) {font-size: 16px;}
     @media (max-width: 768px) {font-size: 14px;}
     @media (max-width: 425px) {font-size: 12px;}

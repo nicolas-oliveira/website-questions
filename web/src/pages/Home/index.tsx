@@ -8,26 +8,16 @@ import {
   Actions,
   Checkbox,
   Search,
-  Input,
-  Textarea,
 } from "./styles";
 
-import {
-  AbsolutePositioningButtonDiv,
-  ButtonContainerLeft,
-  ButtonDivChild,
-  ButtonSubmit,
-  ButtonPrimary,
-  ModalBackground,
-  Modal,
-} from "../../styles/reuseStyles";
+import { ButtonPrimary } from "../../styles/reuseStyles";
 
 import api from "../../services/api";
 
-import { AiOutlineClose, AiOutlineLoading } from "react-icons/ai";
 import { AiOutlineSearch, AiOutlinePlus } from "react-icons/ai";
 import ToolCard from "../../components/ToolCard";
 import ModalConfirmRemove from "../../components/ModalConfirmRemove";
+import ModalForm from "../../components/ModalForm";
 
 interface state {
   // Abre e fecha o modal do formulário.
@@ -99,42 +89,6 @@ export default class Home extends Component {
     }
   }
 
-  handleSubmit = async (e: FormEvent) => {
-    try {
-      e.preventDefault();
-
-      const { formTitle, formLink, formDescription, formTags } = this.state;
-
-      this.setState({ loading: true });
-
-      const newTool = {
-        title: formTitle,
-        link: formLink,
-        description: formDescription,
-        tags: formTags.split(/[# ]+/).filter((eachTag) => eachTag),
-      };
-
-      await api.post("tools", newTool);
-
-      console.log(newTool);
-
-      this.getItems();
-
-      this.setState({
-        isModalFormOpen: false,
-        loading: false,
-        formTitle: "",
-        formLink: "",
-        formDescription: "",
-        formTags: "",
-      });
-
-      console.log("Requisição feita com sucesso");
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   async getItems() {
     try {
       await api
@@ -154,14 +108,30 @@ export default class Home extends Component {
       tool: tool,
     });
 
+  abortRequest = () => {
+    const controller = new AbortController();
+
+    controller.abort();
+
+    this.setState({
+      isModalDeleteOpen: false,
+      isModalFormOpen: false,
+      loading: false,
+    });
+  };
+
   removeItem = async (id: number) => {
     try {
+      this.setState({ loading: true });
+
       const { tools } = this.state;
 
       await api.delete(`/tools/${id}`);
 
       this.setState({
         tools: tools.filter((e: ToolCardContent) => e.id !== id),
+        isModalDeleteOpen: !this.state.isModalDeleteOpen,
+        loading: false,
       });
     } catch (error) {
       console.error(error);
@@ -175,10 +145,6 @@ export default class Home extends Component {
       loading,
       tools,
       tool,
-      formTitle,
-      formLink,
-      formDescription,
-      formTags,
     } = this.state;
 
     return (
@@ -206,62 +172,12 @@ export default class Home extends Component {
         </Actions>
 
         {isModalFormOpen ? (
-          <ModalBackground>
-            <Modal>
-              <AbsolutePositioningButtonDiv>
-                <ButtonDivChild onClick={() => this.toggleModalForm()}>
-                  <AiOutlineClose size="20px" />
-                </ButtonDivChild>
-              </AbsolutePositioningButtonDiv>
-
-              <div className="title-column">
-                <AiOutlinePlus size="26px" />
-                <h1>Add New Tool</h1>
-              </div>
-              <form onSubmit={this.handleSubmit}>
-                <label>Tool Name</label>
-                <Input
-                  value={formTitle}
-                  onChange={(event) =>
-                    this.setState({ formTitle: event.target.value })
-                  }
-                  required
-                />
-
-                <label>Tool Link</label>
-                <Input
-                  value={formLink}
-                  onChange={(event) =>
-                    this.setState({ formLink: event.target.value })
-                  }
-                  type="url"
-                  required
-                />
-
-                <label>Tool Description</label>
-                <Textarea
-                  value={formDescription}
-                  onChange={(event) =>
-                    this.setState({ formDescription: event.target.value })
-                  }
-                  required
-                />
-
-                <label>Tags</label>
-                <Input
-                  value={formTags}
-                  onChange={(event) =>
-                    this.setState({ formTags: event.target.value })
-                  }
-                />
-                <ButtonContainerLeft>
-                  <ButtonSubmit $loading={loading}>
-                    {loading ? <AiOutlineLoading /> : "Add tool"}
-                  </ButtonSubmit>
-                </ButtonContainerLeft>
-              </form>
-            </Modal>
-          </ModalBackground>
+          <ModalForm
+            loading={loading}
+            abort={this.abortRequest.bind(this)}
+            toggleModalForm={this.toggleModalForm.bind(this)}
+            setParentState={this.setState.bind(this)}
+          />
         ) : (
           ""
         )}
@@ -269,8 +185,9 @@ export default class Home extends Component {
         {isModalDeleteOpen ? (
           <ModalConfirmRemove
             tool={tool}
-            toggle={this.toggleModalDelete.bind(this)}
+            abort={this.abortRequest.bind(this)}
             removeItem={this.removeItem.bind(this)}
+            loading={loading}
           />
         ) : (
           ""

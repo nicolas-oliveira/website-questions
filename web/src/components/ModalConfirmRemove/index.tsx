@@ -8,10 +8,13 @@ import {
   Modal,
 } from "../../styles/reuseStyles";
 
+import { AiOutlineLoading } from "react-icons/ai";
+
 interface Props {
   tool: Tool;
-  toggle: Function;
+  abort: Function;
   removeItem: (id: number) => void;
+  loading: boolean;
 }
 
 interface Tool {
@@ -21,8 +24,9 @@ interface Tool {
 
 export default function ModalConfirmRemove({
   tool,
-  toggle,
+  abort,
   removeItem,
+  loading,
 }: Props) {
   return (
     <ModalBackground>
@@ -31,9 +35,9 @@ export default function ModalConfirmRemove({
         <p>Are you sure you want remove {tool.title}?</p>
 
         <ButtonContainerLeft>
-          <ButtonPrimary onClick={() => toggle()}>Cancel</ButtonPrimary>
-          <ButtonAlert onClick={() => removeItem(tool.id)}>
-            Yes, remove
+          <ButtonPrimary onClick={() => abort()}>Cancel</ButtonPrimary>
+          <ButtonAlert onClick={() => removeItem(tool.id)} $loading={loading}>
+            {loading ? <AiOutlineLoading /> : "Yes, remove"}
           </ButtonAlert>
         </ButtonContainerLeft>
       </Modal>
