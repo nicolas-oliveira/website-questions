@@ -1,18 +1,24 @@
 import React from "react";
-import { FiTrash2 } from "react-icons/fi";
 import { Description, ElementBody, Hashtags, TitleCard } from "./styles";
 import {
   AbsolutePositioningButtonDiv,
   ButtonDivChild,
 } from "../../styles/reuseStyles";
+import ModalRemoveCard from "../ModalConfirmRemove";
+import { FiTrash2 } from "react-icons/fi";
 
-interface ToolCardContent {
+interface Props {
   id: number;
   title: string;
   link: string;
-  description: string;
-  tags: String[];
-  toggle: any;
+  description?: string;
+  tags?: String[];
+  toggle: (tool: Tool) => void;
+}
+
+interface Tool {
+  id: number;
+  title: string;
 }
 
 export default function ToolCard({
@@ -22,11 +28,12 @@ export default function ToolCard({
   link,
   tags,
   toggle,
-}: ToolCardContent) {
+}: Props) {
+  const tool = { id, title };
   return (
     <ElementBody key={id}>
       <AbsolutePositioningButtonDiv title="Delete">
-        <ButtonDivChild onClick={() => toggle()}>
+        <ButtonDivChild onClick={() => toggle(tool)}>
           <FiTrash2 size="16px" />
         </ButtonDivChild>
       </AbsolutePositioningButtonDiv>
@@ -42,6 +49,3 @@ export default function ToolCard({
     </ElementBody>
   );
 }
-// export default function TooCard() {
-//   return <div></div>;
-// }

@@ -96,3 +96,58 @@ export const ButtonAlert = styled(ButtonPrimary)`
     background-color: var(--darker-red);
   }
 `;
+
+export const ButtonContainerLeft = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--small);
+`;
+
+export const ModalBackground = styled.div`
+  position: fixed;
+  z-index: 1;
+  padding-top: 100px;
+
+  left: 0;
+  top: 0;
+
+  width: 100%;
+  height: 100%;
+
+  overflow: auto;
+
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.4);
+`;
+
+export const Modal = styled.div`
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: column;
+
+  background-color: var(--white);
+  margin: auto;
+  border-radius: 5px;
+  max-width: 700px;
+  width: 90%;
+  padding: var(--bigger);
+
+  .title-column {
+    display: flex;
+    justify-content: column;
+    align-items: center;
+    margin-bottom: var(--small);
+  }
+
+  input {
+    margin-bottom: 10px;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+`;

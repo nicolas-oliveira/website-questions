@@ -8,35 +8,48 @@ import {
   Actions,
   Checkbox,
   Search,
-  Modal,
   Input,
-  FormDiv,
-  ButtonContainerLeft,
   Textarea,
 } from "./styles";
 
 import {
   AbsolutePositioningButtonDiv,
+  ButtonContainerLeft,
   ButtonDivChild,
   ButtonSubmit,
   ButtonPrimary,
-  ButtonAlert,
+  ModalBackground,
+  Modal,
 } from "../../styles/reuseStyles";
 
-import {
-  Description,
-  ElementBody,
-  Hashtags,
-  TitleCard,
-} from "../../components/ToolCard/styles";
-
 import api from "../../services/api";
-// import ToolCard from "../../components/ToolCard";
 
-import { FiTrash2 } from "react-icons/fi";
 import { AiOutlineClose, AiOutlineLoading } from "react-icons/ai";
 import { AiOutlineSearch, AiOutlinePlus } from "react-icons/ai";
 import ToolCard from "../../components/ToolCard";
+import ModalConfirmRemove from "../../components/ModalConfirmRemove";
+
+interface state {
+  // Abre e fecha o modal do formulário.
+  isModalFormOpen: boolean;
+
+  // Abre e fecha o modal de confirmação.
+  isModalDeleteOpen: boolean;
+
+  // Lista de objetos que representa as tools criadas pelo usuário.
+  tools: ToolCardContent[];
+
+  tool: Tool;
+
+  // Indica se certo elemento está carregando.
+  loading: boolean;
+
+  // Estados que controlam os inputs do formulário.
+  formTitle: string;
+  formLink: string;
+  formDescription: string;
+  formTags: string;
+}
 
 interface ToolCardContent {
   id: number;
@@ -46,76 +59,43 @@ interface ToolCardContent {
   tags: String[];
 }
 
-interface state {
-  isModalFormOpen: boolean;
-  isModalDeleteOpen: boolean;
-  loading: boolean;
-  tools: ToolCardContent[];
-  formTitle: string;
-  formLink: string;
-  formDescription: string;
-  formTags: string;
+interface Tool {
+  id: number;
+  title: string;
 }
 
 export default class Home extends Component {
   state = {
-    isModalFormOpen: false,
     isModalDeleteOpen: false,
+    isModalFormOpen: false,
     loading: false,
     tools: [],
+    tool: { id: 0, title: "" },
     formTitle: "",
     formLink: "",
     formDescription: "",
     formTags: "",
   };
 
-  async componentDidMount() {
+  componentDidMount() {
     const tools = localStorage.getItem("tools");
     if (tools) this.setState({ tools: JSON.parse(tools) });
 
-    await api
-      .get("tools?_sort=id&_order=desc")
-      .then((response) => this.setState({ tools: response.data }));
+    this.getItems();
   }
 
   componentDidUpdate(e: any, prevState: state) {
-    const { isModalFormOpen, tools } = this.state;
+    const { isModalFormOpen, isModalDeleteOpen, tools } = this.state;
     const body = document.querySelector("body");
 
     if (prevState.tools !== tools) {
       localStorage.setItem("tools", JSON.stringify(tools));
     }
 
-    if (isModalFormOpen) {
+    if (isModalFormOpen || isModalDeleteOpen) {
       if (body) body.style.overflowY = "hidden";
     } else {
       if (body) body.style.overflowY = "auto";
-    }
-  }
-
-  async getItems() {
-    await api
-      .get("tools?_sort=id&_order=desc")
-      .then((response) => this.setState({ tools: response.data }));
-  }
-
-  toggleModalForm() {
-    const { isModalFormOpen } = this.state;
-
-    if (!isModalFormOpen) {
-      this.setState({ isModalFormOpen: true });
-    } else {
-      this.setState({ isModalFormOpen: false });
-    }
-  }
-
-  toggleModalDelete() {
-    const { isModalDeleteOpen } = this.state;
-
-    if (!isModalDeleteOpen) {
-      this.setState({ isModalDeleteOpen: true });
-    } else {
-      this.setState({ isModalDeleteOpen: false });
     }
   }
 
@@ -155,6 +135,25 @@ export default class Home extends Component {
     }
   };
 
+  async getItems() {
+    try {
+      await api
+        .get("tools?_sort=id&_order=desc")
+        .then((response) => this.setState({ tools: response.data }));
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  toggleModalForm = () =>
+    this.setState({ isModalFormOpen: !this.state.isModalFormOpen });
+
+  toggleModalDelete = (tool: Tool) =>
+    this.setState({
+      isModalDeleteOpen: !this.state.isModalDeleteOpen,
+      tool: tool,
+    });
+
   deleteItem = async (id: number) => {
     try {
       const { tools } = this.state;
@@ -175,6 +174,7 @@ export default class Home extends Component {
       isModalDeleteOpen,
       loading,
       tools,
+      tool,
       formTitle,
       formLink,
       formDescription,
@@ -206,14 +206,10 @@ export default class Home extends Component {
         </Actions>
 
         {isModalFormOpen ? (
-          <Modal>
-            <FormDiv>
+          <ModalBackground>
+            <Modal>
               <AbsolutePositioningButtonDiv>
-                <ButtonDivChild
-                  onClick={() =>
-                    this.setState({ isModalFormOpen: !isModalFormOpen })
-                  }
-                >
+                <ButtonDivChild onClick={() => this.toggleModalForm()}>
                   <AiOutlineClose size="20px" />
                 </ButtonDivChild>
               </AbsolutePositioningButtonDiv>
@@ -264,45 +260,37 @@ export default class Home extends Component {
                   </ButtonSubmit>
                 </ButtonContainerLeft>
               </form>
-            </FormDiv>
-          </Modal>
+            </Modal>
+          </ModalBackground>
         ) : (
           ""
         )}
 
         {isModalDeleteOpen ? (
-          <Modal>
-            <FormDiv>
-              <h1>Remove tool</h1>
-              <p>Are you sure you want remove tool.title?</p>
-
-              <ButtonContainerLeft>
-                <ButtonPrimary onClick={() => this.toggleModalDelete()}>
-                  Cancel
-                </ButtonPrimary>
-                <ButtonAlert onClick={() => console.log("infelizmente")}>
-                  Yes, remove
-                </ButtonAlert>
-              </ButtonContainerLeft>
-            </FormDiv>
-          </Modal>
+          <ModalConfirmRemove
+            tool={tool}
+            toggle={this.toggleModalDelete.bind(this)}
+            deleteItem={this.deleteItem.bind(this)}
+          />
         ) : (
           ""
         )}
 
-        {tools.map((tool: ToolCardContent) => {
-          return (
-            <ToolCard
-              key={tool.id}
-              id={tool.id}
-              title={tool.title}
-              link={tool.link}
-              description={tool.description}
-              tags={tool.tags}
-              toggle={this.toggleModalDelete.bind(this)}
-            />
-          );
-        })}
+        {tools.map(
+          ({ id, title, link, description, tags }: ToolCardContent) => {
+            return (
+              <ToolCard
+                key={id}
+                id={id}
+                title={title}
+                link={link}
+                description={description}
+                tags={tags}
+                toggle={this.toggleModalDelete.bind(this)}
+              />
+            );
+          }
+        )}
       </HomeContainer>
     );
   }
