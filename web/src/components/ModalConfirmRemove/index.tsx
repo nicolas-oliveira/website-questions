@@ -10,14 +10,14 @@ import {
 
 import { AiOutlineLoading } from "react-icons/ai";
 
-interface Props {
-  tool: Tool;
+interface ModalConfirmRemoveProps {
+  tool: ToolProps;
   abort: Function;
   removeItem: (id: number) => void;
   loading: boolean;
 }
 
-interface Tool {
+interface ToolProps {
   id: number;
   title: string;
 }
@@ -27,7 +27,7 @@ export default function ModalConfirmRemove({
   abort,
   removeItem,
   loading,
-}: Props) {
+}: ModalConfirmRemoveProps) {
   return (
     <ModalBackground>
       <Modal>

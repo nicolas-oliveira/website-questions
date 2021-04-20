@@ -19,19 +19,17 @@ import {
 import api from "../../services/api";
 import { abort } from "node:process";
 
-interface Props {
+interface ModalFormProps {
   loading: boolean;
   setParentState: any;
-  toggleModalForm: Function;
   abort: Function;
 }
 
 export default function ModalForm({
   loading,
   setParentState,
-  toggleModalForm,
   abort,
-}: Props) {
+}: ModalFormProps) {
   const [title, setTitle] = useState("");
   const [link, setLink] = useState("");
   const [description, setDescription] = useState("");

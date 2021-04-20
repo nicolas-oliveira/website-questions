@@ -1,4 +1,4 @@
-import React, { Component, FormEvent } from "react";
+import React, { Component } from "react";
 
 import {
   HomeContainer,
@@ -27,21 +27,16 @@ interface state {
   isModalDeleteOpen: boolean;
 
   // Lista de objetos que representa as tools criadas pelo usuário.
-  tools: ToolCardContent[];
+  tools: ToolCardProps[];
 
-  tool: Tool;
+  // Objeto que representa apenas uma ferramenta.
+  tool: ToolProps;
 
   // Indica se certo elemento está carregando.
   loading: boolean;
-
-  // Estados que controlam os inputs do formulário.
-  formTitle: string;
-  formLink: string;
-  formDescription: string;
-  formTags: string;
 }
 
-interface ToolCardContent {
+interface ToolCardProps {
   id: number;
   title: string;
   link: string;
@@ -49,7 +44,7 @@ interface ToolCardContent {
   tags: String[];
 }
 
-interface Tool {
+interface ToolProps {
   id: number;
   title: string;
 }
@@ -61,10 +56,6 @@ export default class Home extends Component {
     loading: false,
     tools: [],
     tool: { id: 0, title: "" },
-    formTitle: "",
-    formLink: "",
-    formDescription: "",
-    formTags: "",
   };
 
   componentDidMount() {
@@ -102,12 +93,14 @@ export default class Home extends Component {
   toggleModalForm = () =>
     this.setState({ isModalFormOpen: !this.state.isModalFormOpen });
 
-  toggleModalDelete = (tool: Tool) =>
+  // O parâmetro é definido anteriormente no ToolCard correspondente
+  toggleModalDelete = (tool: ToolProps) =>
     this.setState({
       isModalDeleteOpen: !this.state.isModalDeleteOpen,
       tool: tool,
     });
 
+  // Método responsável por desfazer a requisição.
   abortRequest = () => {
     const controller = new AbortController();
 
@@ -129,7 +122,7 @@ export default class Home extends Component {
       await api.delete(`/tools/${id}`);
 
       this.setState({
-        tools: tools.filter((e: ToolCardContent) => e.id !== id),
+        tools: tools.filter((e: ToolCardProps) => e.id !== id),
         isModalDeleteOpen: !this.state.isModalDeleteOpen,
         loading: false,
       });
@@ -175,7 +168,6 @@ export default class Home extends Component {
           <ModalForm
             loading={loading}
             abort={this.abortRequest.bind(this)}
-            toggleModalForm={this.toggleModalForm.bind(this)}
             setParentState={this.setState.bind(this)}
           />
         ) : (
@@ -193,21 +185,19 @@ export default class Home extends Component {
           ""
         )}
 
-        {tools.map(
-          ({ id, title, link, description, tags }: ToolCardContent) => {
-            return (
-              <ToolCard
-                key={id}
-                id={id}
-                title={title}
-                link={link}
-                description={description}
-                tags={tags}
-                toggle={this.toggleModalDelete.bind(this)}
-              />
-            );
-          }
-        )}
+        {tools.map(({ id, title, link, description, tags }: ToolCardProps) => {
+          return (
+            <ToolCard
+              key={id}
+              id={id}
+              title={title}
+              link={link}
+              description={description}
+              tags={tags}
+              toggle={this.toggleModalDelete.bind(this)}
+            />
+          );
+        })}
       </HomeContainer>
     );
   }
