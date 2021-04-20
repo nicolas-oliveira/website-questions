@@ -11,7 +11,7 @@ import {
 interface Props {
   tool: Tool;
   toggle: Function;
-  deleteItem: (id: number) => void;
+  removeItem: (id: number) => void;
 }
 
 interface Tool {
@@ -22,7 +22,7 @@ interface Tool {
 export default function ModalConfirmRemove({
   tool,
   toggle,
-  deleteItem,
+  removeItem,
 }: Props) {
   return (
     <ModalBackground>
@@ -32,7 +32,7 @@ export default function ModalConfirmRemove({
 
         <ButtonContainerLeft>
           <ButtonPrimary onClick={() => toggle()}>Cancel</ButtonPrimary>
-          <ButtonAlert onClick={() => deleteItem(tool.id)}>
+          <ButtonAlert onClick={() => removeItem(tool.id)}>
             Yes, remove
           </ButtonAlert>
         </ButtonContainerLeft>

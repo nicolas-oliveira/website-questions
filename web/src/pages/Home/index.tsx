@@ -154,7 +154,7 @@ export default class Home extends Component {
       tool: tool,
     });
 
-  deleteItem = async (id: number) => {
+  removeItem = async (id: number) => {
     try {
       const { tools } = this.state;
 
@@ -270,7 +270,7 @@ export default class Home extends Component {
           <ModalConfirmRemove
             tool={tool}
             toggle={this.toggleModalDelete.bind(this)}
-            deleteItem={this.deleteItem.bind(this)}
+            removeItem={this.removeItem.bind(this)}
           />
         ) : (
           ""
