@@ -41,11 +41,14 @@ export default function ModalForm({
 
       setParentState({ loading: true });
 
+      // Excluir espaços e '#'
+      const regex = new RegExp("# ");
+
       const newTool = {
         title,
         link,
         description,
-        tags: tags.split(/[# ]+/).filter((eachTag) => eachTag),
+        tags: tags.split(regex).filter((eachTag) => eachTag),
       };
 
       await api.post("tools", newTool);
@@ -54,15 +57,13 @@ export default function ModalForm({
 
       await api
         .get("tools?_sort=id&_order=desc")
-        .then((response) => setParentState({ tools: response.data }));
+        .then((response) =>
+          setParentState({ toolsData: response.data, tools: response.data })
+        );
 
       setParentState({
         isModalFormOpen: false,
         loading: false,
-        formTitle: "",
-        formLink: "",
-        formDescription: "",
-        formTags: "",
       });
 
       console.log("Requisição feita com sucesso");

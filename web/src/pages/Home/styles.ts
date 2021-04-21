@@ -1,10 +1,10 @@
-import styled from "styled-components";
+import styled, { css, keyframes } from "styled-components";
 
 export const Actions = styled.div`
   display: flex;
   justify-content: space-between;
   flex-direction: row;
-  min-width: 70vw;
+  width: 75vw;
 
   @media (max-width: 768px) {
     flex-direction: column;

@@ -9,7 +9,7 @@ export const ElementBody = styled.div`
   background-color: var(--darker-white);
   border-radius: 5px;
 
-  max-width: 85vw;
+  width: 75vw;
 `;
 
 export const TitleCard = styled.a`

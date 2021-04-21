@@ -42,8 +42,8 @@ export default function ToolCard({
       <Description>{description}</Description>
 
       <Hashtags>
-        {tags?.map((tag) => {
-          return <span>#{tag}</span>;
+        {tags?.map((tag, index) => {
+          return <span key={index}>#{tag}</span>;
         })}
       </Hashtags>
     </ElementBody>

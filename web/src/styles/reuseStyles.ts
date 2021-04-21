@@ -1,6 +1,19 @@
 // Aqui contém estilos utilizados mais de uma vez na aplicação
 import styled, { css, keyframes } from "styled-components";
 
+interface LoadingProps {
+  $loading: boolean;
+}
+
+const rotate = keyframes`
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+`;
+
 // Estilo usado para os ícones que devem ficar no canto superior direito
 // de uma div qualquer
 export const AbsolutePositioningButtonDiv = styled.a`
@@ -50,24 +63,11 @@ export const ButtonPrimary = styled.button`
   }
 `;
 
-const rotate = keyframes`
-	from {
-		transform: rotate(0deg);
-	}
-	to {
-		transform: rotate(360deg);
-	}
-`;
-
-interface ButtonProps {
-  $loading: boolean;
-}
-
-export const ButtonSubmit = styled(ButtonPrimary).attrs<ButtonProps>(
+export const ButtonSubmit = styled(ButtonPrimary).attrs<LoadingProps>(
   ({ $loading }) => ({
     disabled: $loading,
   })
-)<ButtonProps>`
+)<LoadingProps>`
   height: 2em;
   min-width: 4em;
 
@@ -146,4 +146,18 @@ export const Modal = styled.div`
     display: flex;
     flex-direction: column;
   }
+`;
+
+export const ToolCardListContainer = styled.div`
+  ${({ $loading }: LoadingProps) =>
+    $loading &&
+    css`
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: var(--medium);
+      svg {
+        animation: ${rotate} linear infinite 1s;
+      }
+    `}
 `;

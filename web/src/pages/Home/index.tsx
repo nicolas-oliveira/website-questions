@@ -10,24 +10,34 @@ import {
   Search,
 } from "./styles";
 
-import { ButtonPrimary } from "../../styles/reuseStyles";
+import { ButtonPrimary, ToolCardListContainer } from "../../styles/reuseStyles";
 
 import api from "../../services/api";
 
-import { AiOutlineSearch, AiOutlinePlus } from "react-icons/ai";
+import {
+  AiOutlineSearch,
+  AiOutlinePlus,
+  AiOutlineLoading,
+} from "react-icons/ai";
 import ToolCard from "../../components/ToolCard";
 import ModalConfirmRemove from "../../components/ModalConfirmRemove";
 import ModalForm from "../../components/ModalForm";
 
 interface state {
-  // Abre e fecha o modal do formulário.
-  isModalFormOpen: boolean;
-
   // Abre e fecha o modal de confirmação.
   isModalDeleteOpen: boolean;
 
-  // Lista de objetos que representa as tools criadas pelo usuário.
-  tools: ToolCardProps[];
+  // Abre e fecha o modal do formulário.
+  isModalFormOpen: boolean;
+
+  // Lista de todos os objetos que representa as tools criadas pelo usuário.
+  toolsData: ToolCardProps[];
+
+  // Lista de objetos que representa as tools visualizadas pelo usuário.
+  toolsView: ToolCardProps[];
+
+  // Valor da requisição feito pelo usuário na busca.
+  searchValue: string;
 
   // Objeto que representa apenas uma ferramenta.
   tool: ToolProps;
@@ -53,41 +63,40 @@ export default class Home extends Component {
   state = {
     isModalDeleteOpen: false,
     isModalFormOpen: false,
-    loading: false,
-    tools: [],
+    toolsData: [],
+    toolsView: [],
+    searchValue: "",
     tool: { id: 0, title: "" },
+    loading: false,
   };
 
-  componentDidMount() {
-    const tools = localStorage.getItem("tools");
-    if (tools) this.setState({ tools: JSON.parse(tools) });
-
-    this.getItems();
-  }
-
-  componentDidUpdate(e: any, prevState: state) {
-    const { isModalFormOpen, isModalDeleteOpen, tools } = this.state;
-    const body = document.querySelector("body");
-
-    if (prevState.tools !== tools) {
-      localStorage.setItem("tools", JSON.stringify(tools));
-    }
-
-    if (isModalFormOpen || isModalDeleteOpen) {
-      if (body) body.style.overflowY = "hidden";
-    } else {
-      if (body) body.style.overflowY = "auto";
-    }
-  }
-
-  async getItems() {
+  async componentDidMount() {
     try {
+      const tools = localStorage.getItem("tools");
+      if (tools) this.setState({ toolsData: JSON.parse(tools) });
+
       await api
         .get("tools?_sort=id&_order=desc")
-        .then((response) => this.setState({ tools: response.data }));
+        .then((response) =>
+          this.setState({ toolsData: response.data, toolsView: response.data })
+        );
     } catch (error) {
       console.error(error);
     }
+  }
+
+  componentDidUpdate(e: any, prevState: state) {
+    const { isModalFormOpen, isModalDeleteOpen, toolsData } = this.state;
+    const body = document.querySelector("body");
+
+    if (prevState.toolsData !== toolsData) {
+      localStorage.setItem("tools", JSON.stringify(toolsData));
+    }
+
+    if (body)
+      isModalFormOpen || isModalDeleteOpen
+        ? (body.style.overflowY = "hidden")
+        : (body.style.overflowY = "auto");
   }
 
   toggleModalForm = () =>
@@ -117,12 +126,15 @@ export default class Home extends Component {
     try {
       this.setState({ loading: true });
 
-      const { tools } = this.state;
+      const { toolsData } = this.state;
 
       await api.delete(`/tools/${id}`);
 
+      const filteredList = toolsData.filter((e: ToolCardProps) => e.id !== id);
+
       this.setState({
-        tools: tools.filter((e: ToolCardProps) => e.id !== id),
+        toolsData: filteredList,
+        toolsView: filteredList,
         isModalDeleteOpen: !this.state.isModalDeleteOpen,
         loading: false,
       });
@@ -131,13 +143,30 @@ export default class Home extends Component {
     }
   };
 
+  async requestSearch(value: string) {
+    this.setState({ searchValue: value, loading: true });
+    if (value != "") {
+      try {
+        const { data } = await api.get(`/tools?q=${value}`);
+
+        this.setState({ toolsView: data, loading: false });
+      } catch (error) {
+        console.error(error);
+      }
+    } else {
+      const { toolsData } = this.state;
+      this.setState({ toolsView: toolsData, loading: false });
+    }
+  }
+
   render() {
     const {
-      isModalFormOpen,
       isModalDeleteOpen,
-      loading,
-      tools,
+      isModalFormOpen,
+      searchValue,
+      toolsView,
       tool,
+      loading,
     } = this.state;
 
     return (
@@ -149,7 +178,11 @@ export default class Home extends Component {
           <GroupSearch>
             <Search>
               <AiOutlineSearch size="16px" />
-              <input type="text" />
+              <input
+                type="text"
+                value={searchValue}
+                onChange={(e) => this.requestSearch(e.target.value)}
+              />
             </Search>
 
             <Checkbox>
@@ -185,19 +218,27 @@ export default class Home extends Component {
           ""
         )}
 
-        {tools.map(({ id, title, link, description, tags }: ToolCardProps) => {
-          return (
-            <ToolCard
-              key={id}
-              id={id}
-              title={title}
-              link={link}
-              description={description}
-              tags={tags}
-              toggle={this.toggleModalDelete.bind(this)}
-            />
-          );
-        })}
+        <ToolCardListContainer $loading={loading}>
+          {loading ? (
+            <AiOutlineLoading size="36px" />
+          ) : (
+            toolsView.map(
+              ({ id, title, link, description, tags }: ToolCardProps) => {
+                return (
+                  <ToolCard
+                    key={id}
+                    id={id}
+                    title={title}
+                    link={link}
+                    description={description}
+                    tags={tags}
+                    toggle={this.toggleModalDelete.bind(this)}
+                  />
+                );
+              }
+            )
+          )}
+        </ToolCardListContainer>
       </HomeContainer>
     );
   }
