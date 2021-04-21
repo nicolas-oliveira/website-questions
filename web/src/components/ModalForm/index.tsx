@@ -58,7 +58,7 @@ export default function ModalForm({
       await api
         .get("tools?_sort=id&_order=desc")
         .then((response) =>
-          setParentState({ toolsData: response.data, tools: response.data })
+          setParentState({ toolsData: response.data, toolsView: response.data })
         );
 
       setParentState({

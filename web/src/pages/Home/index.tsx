@@ -42,6 +42,9 @@ interface state {
   // Objeto que representa apenas uma ferramenta.
   tool: ToolProps;
 
+  //
+  isTagsOnly: boolean;
+
   // Indica se certo elemento está carregando.
   loading: boolean;
 }
@@ -68,6 +71,7 @@ export default class Home extends Component {
     searchValue: "",
     tool: { id: 0, title: "" },
     loading: false,
+    isTagsOnly: false,
   };
 
   async componentDidMount() {
@@ -86,12 +90,20 @@ export default class Home extends Component {
   }
 
   componentDidUpdate(e: any, prevState: state) {
-    const { isModalFormOpen, isModalDeleteOpen, toolsData } = this.state;
+    const {
+      isModalFormOpen,
+      isModalDeleteOpen,
+      toolsData,
+      isTagsOnly,
+      searchValue,
+    } = this.state;
+
     const body = document.querySelector("body");
 
-    if (prevState.toolsData !== toolsData) {
+    if (prevState.toolsData !== toolsData)
       localStorage.setItem("tools", JSON.stringify(toolsData));
-    }
+
+    if (prevState.isTagsOnly !== isTagsOnly) this.requestSearch(searchValue);
 
     if (body)
       isModalFormOpen || isModalDeleteOpen
@@ -144,18 +156,26 @@ export default class Home extends Component {
   };
 
   async requestSearch(value: string) {
-    this.setState({ searchValue: value, loading: true });
-    if (value != "") {
-      try {
-        const { data } = await api.get(`/tools?q=${value}`);
+    try {
+      this.setState({ searchValue: value, loading: true });
+      const { isTagsOnly } = this.state;
 
-        this.setState({ toolsView: data, loading: false });
-      } catch (error) {
-        console.error(error);
+      if (value != "") {
+        if (isTagsOnly) {
+          const { data } = await api.get(`/tools?tags_like=${value}`);
+
+          this.setState({ toolsView: data, loading: false });
+        } else {
+          const { data } = await api.get(`/tools?q=${value}`);
+
+          this.setState({ toolsView: data, loading: false });
+        }
+      } else {
+        const { toolsData } = this.state;
+        this.setState({ toolsView: toolsData, loading: false });
       }
-    } else {
-      const { toolsData } = this.state;
-      this.setState({ toolsView: toolsData, loading: false });
+    } catch (error) {
+      console.error(error);
     }
   }
 
@@ -165,8 +185,9 @@ export default class Home extends Component {
       isModalFormOpen,
       searchValue,
       toolsView,
-      tool,
+      isTagsOnly,
       loading,
+      tool,
     } = this.state;
 
     return (
@@ -186,8 +207,14 @@ export default class Home extends Component {
             </Search>
 
             <Checkbox>
-              <input type="checkbox" id="input" />
-              <label htmlFor="input">search in tags only</label>
+              <input
+                type="checkbox"
+                id="isTheckboxTagsOnly"
+                onChange={(e) =>
+                  this.setState({ isTagsOnly: e.target.checked })
+                }
+              />
+              <label htmlFor="isTheckboxTagsOnly">search in tags only</label>
             </Checkbox>
           </GroupSearch>
 
